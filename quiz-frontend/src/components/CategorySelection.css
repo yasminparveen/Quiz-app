@@ -1,0 +1,120 @@
+/* CategorySelection.css */
+.layout {
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.layout.dark {
+    background-color: #001529;
+}
+
+/* CategorySelection.css */
+.category-item {
+    font-family: 'Poppins', sans-serif;
+    /* Use Poppins for category items */
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.category-item:hover {
+    font-family: 'Roboto', sans-serif;
+    /* Change to Roboto on hover for a different effect */
+    font-weight: 700;
+}
+
+.title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1890ff;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    color: white;
+    margin-left: 10px;
+    font-size: 24px;
+}
+
+.theme-switch {
+    margin-left: auto;
+}
+
+.content {
+    padding: 20px;
+}
+
+.category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.category-item {
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.category-item:hover {
+    background-color: #1890ff;
+    color: white;
+}
+
+.category-item.selected {
+    background-color: #c41aa5;
+    color: white;
+}
+
+.submit-button {
+    display: block;
+    margin: 0 auto;
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .theme-switch {
+        margin-top: 10px;
+    }
+
+    .category-item {
+        width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 20px;
+    }
+
+    .category-item {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .submit-button {
+        width: 150px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
