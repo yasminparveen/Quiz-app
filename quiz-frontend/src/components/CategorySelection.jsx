@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Radio, Button } from 'antd';
-import './CategorySelection.css';
+import { Card, Button, Row, Col, Typography, Space } from 'antd';
+import { CheckCircleOutlined, RightOutlined } from '@ant-design/icons';
 import categories from '../assets/categories';  // Import the categories array
+
+const { Title, Text } = Typography;
 
 const CategorySelection = ({ onCategorySelect }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -33,40 +35,72 @@ const CategorySelection = ({ onCategorySelect }) => {
   };
 
   return (
-    <div className="category-container">
-      <Card title="Select a Category" bordered={false} className="category-card">
-        <Radio.Group onChange={handleCategoryChange} value={selectedCategory}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 py-10">
+      <Card bordered={false} className="bg-transparent">
+        <div className="text-center mb-8">
+          <Title level={2} className="text-white">
+            <CheckCircleOutlined className="text-green-500 text-3xl" /> Select a Category
+          </Title>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map((category, index) => (
-            <Radio key={index} value={category.name}>
-              {category.name}
-            </Radio>
+            <Card
+              hoverable
+              key={index}
+              onClick={() => handleCategoryChange({ target: { value: category.name } })}
+              className={`p-8 text-center transition duration-300 ${
+                selectedCategory === category.name
+                  ? 'bg-blue-600 border-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-900'
+              } hover:bg-blue-500 hover:text-white`}
+            >
+              <Space direction="vertical" size="large">
+                <Text strong>{category.name}</Text>
+              </Space>
+            </Card>
           ))}
-        </Radio.Group>
+        </div>
 
         {selectedCategory && (
-          <Radio.Group
-            onChange={handleLevelChange}
-            value={selectedLevel}
-            style={{ marginTop: '20px' }}
-          >
-            {categories
-              .find((cat) => cat.name === selectedCategory)
-              .levels.map((level, index) => (
-                <Radio key={index} value={level.level}>
-                  {level.level.charAt(0).toUpperCase() + level.level.slice(1)} Level
-                </Radio>
-              ))}
-          </Radio.Group>
+          <>
+            <div className="text-center mt-10">
+              <Title level={4} className="text-white">Select Difficulty Level</Title>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+              {categories
+                .find((cat) => cat.name === selectedCategory)
+                .levels.map((level, index) => (
+                  <Card
+                    hoverable
+                    key={index}
+                    onClick={() => handleLevelChange({ target: { value: level.level } })}
+                    className={`p-8 text-center transition duration-300 ${
+                      selectedLevel === level.level
+                        ? 'bg-green-600 border-green-600 text-white'
+                        : 'bg-gray-100 text-gray-900'
+                    } hover:bg-green-500 hover:text-white`}
+                  >
+                    <Text strong>{level.level.charAt(0).toUpperCase() + level.level.slice(1)} Level</Text>
+                  </Card>
+                ))}
+            </div>
+          </>
         )}
 
-        <Button
-          type="primary"
-          onClick={handleSubmit}
-          disabled={!selectedCategory || !selectedLevel}
-          style={{ marginTop: '20px' }}
-        >
-          Continue
-        </Button>
+        <div className="flex justify-center mt-10">
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            disabled={!selectedCategory || !selectedLevel}
+            icon={<RightOutlined />}
+            size="large"
+            className="bg-blue-600 border-blue-600 text-white hover:bg-blue-500 hover:border-blue-500"
+          >
+            Continue
+          </Button>
+        </div>
       </Card>
     </div>
   );

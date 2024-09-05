@@ -1,4 +1,3 @@
-// src/components/Quiz.jsx
 import React, { useState, useEffect } from 'react';
 import { Button, Radio, Card } from 'antd';
 
@@ -39,19 +38,26 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   };
 
   if (!quizUrl) {
-    return <div>Please select a category to start the quiz.</div>;
+    return <div className="text-white text-center py-8">Please select a category to start the quiz.</div>;
   }
 
   if (questions.length === 0) {
-    return <div>Loading questions...</div>;
+    return <div className="text-white text-center py-8">Loading questions...</div>;
   }
 
   if (isQuizCompleted) {
     return (
-      <div>
-        <h2>Quiz Completed!</h2>
-        <p>Your Score: {score}/{questions.length}</p>
-        <Button type="primary" onClick={() => onQuizComplete(null)}>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+        <h2 className="text-white text-3xl font-bold mb-4">Quiz Completed!</h2>
+        <p className="text-white text-xl mb-6">
+          Your Score: {score}/{questions.length}
+        </p>
+        <Button
+          type="primary"
+          size="large"
+          className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500"
+          onClick={() => onQuizComplete(null)}
+        >
           Play Again
         </Button>
       </div>
@@ -65,26 +71,42 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   ].sort(); // Shuffle the answers
 
   return (
-    <div>
-      <Card title={`Question ${currentQuestionIndex + 1} / ${questions.length}`}>
-        <h3 dangerouslySetInnerHTML={{ __html: currentQuestion.question }} />
-        <Radio.Group onChange={handleAnswerChange} value={selectedAnswer}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+      <Card className="w-full max-w-2xl bg-gray-800 border-none text-white">
+        <div className="text-xl font-semibold mb-6 text-center">
+          Question {currentQuestionIndex + 1} / {questions.length}
+        </div>
+        <h3 className="text-2xl font-bold mb-8" dangerouslySetInnerHTML={{ __html: currentQuestion.question }} />
+
+        <Radio.Group
+          onChange={handleAnswerChange}
+          value={selectedAnswer}
+          className="flex flex-col space-y-4 text-lg"
+        >
           {answers.map((answer, index) => (
-            <Radio key={index} value={answer}>
+            <Radio
+              key={index}
+              value={answer}
+              className={`bg-gray-700 p-4 rounded-lg cursor-pointer text-lg text-white hover:bg-gray-600 ${
+                selectedAnswer === answer ? 'bg-blue-500' : ''
+              }`}
+            >
               <span dangerouslySetInnerHTML={{ __html: answer }} />
             </Radio>
           ))}
         </Radio.Group>
-        <Button
-          type="primary"
-          onClick={handleNextQuestion}
-          disabled={!selectedAnswer}
-          style={{ marginTop: '20px' }}
-        >
-          {currentQuestionIndex === questions.length - 1
-            ? 'Finish Quiz'
-            : 'Next Question'}
-        </Button>
+
+        <div className="flex justify-center mt-8">
+          <Button
+            type="primary"
+            size="large"
+            onClick={handleNextQuestion}
+            disabled={!selectedAnswer}
+            className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500"
+          >
+            {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+          </Button>
+        </div>
       </Card>
     </div>
   );
