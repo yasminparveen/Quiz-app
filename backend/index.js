@@ -26,7 +26,16 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   age: { type: Number, required: false },
+  quizAttempts: [
+    {
+      category: { type: String, required: true },
+      score: { type: Number, required: true },
+      totalQuestions: { type: Number, required: true },
+      date: { type: Date, default: Date.now }
+    }
+  ],
 });
+
 
 const UserModel = mongoose.model("User", userSchema);
 
@@ -98,6 +107,31 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/saveScore", async (req, res) => {
+  try {
+    const { userId, category, score, totalQuestions } = req.body;
+
+    // Find the user by ID
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Add the new quiz attempt
+    user.quizAttempts.push({
+      category: category,
+      score: score,
+      totalQuestions: totalQuestions,
+    });
+
+    // Save the updated user document
+    await user.save();
+
+    res.status(200).json({ message: "Score saved successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error saving score", error });
+  }
+});
 
 app.post("/addUser", async (req, res) => {
   try {

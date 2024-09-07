@@ -13,29 +13,28 @@ const App = () => {
   const navigate = useNavigate();
 
   const handleCategorySelect = (categoryUrl) => {
-    setQuizUrl(categoryUrl);
-    setScore(null);
-    navigate('/quiz');
+    setQuizUrl(categoryUrl); // Set the quiz URL for selected category
+    setScore(null); // Reset score
+    navigate('/quiz'); // Navigate to the quiz page
   };
 
   const handleQuizComplete = (finalScore) => {
     if (finalScore !== null) {
       setScore(finalScore);
-      setTotalQuestions(10); // Assuming each quiz has 10 questions; adjust accordingly
-      navigate('/result');
+      setTotalQuestions(10); // Assuming each quiz has 10 questions; adjust as needed
+      navigate('/result'); // Navigate to the result page
     }
   };
 
   const handleRetry = () => {
-    setQuizUrl(null);
-    setScore(null);
-    navigate('/quiz');
+    setScore(null); // Reset score for retry
+    navigate('/quiz'); // Stay on the quiz page for retry
   };
 
   const handleReturnToCategories = () => {
-    setQuizUrl(null);
-    setScore(null);
-    navigate('/categories');
+    setQuizUrl(null); // Reset the quiz selection so a new category can be selected
+    setScore(null); // Reset the score to allow fresh category selection
+    navigate('/categories'); // Navigate back to category selection page
   };
 
   return (
@@ -51,7 +50,7 @@ const App = () => {
             score={score}
             totalQuestions={totalQuestions}
             onRetry={handleRetry}
-            onReturnToCategories={handleReturnToCategories}
+            onReturnToCategories={handleReturnToCategories} // Ensure the function is passed correctly
           />
         }
       />

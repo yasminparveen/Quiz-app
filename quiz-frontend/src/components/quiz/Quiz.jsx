@@ -7,6 +7,7 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds for each question
 
   // Fetch the questions from the API
   useEffect(() => {
@@ -18,23 +19,70 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
     }
   }, [quizUrl]);
 
+  // Timer countdown logic for each question
+  useEffect(() => {
+    if (timeLeft > 0 && !isQuizCompleted) {
+      const timerId = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+
+      return () => clearInterval(timerId); // Cleanup on unmount
+    } else if (timeLeft === 0 && !isQuizCompleted) {
+      handleNextQuestion(); // Automatically move to the next question when time runs out
+    }
+  }, [timeLeft, isQuizCompleted]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
+
   const handleAnswerChange = (e) => {
     setSelectedAnswer(e.target.value);
   };
 
+  const handleQuizComplete = (finalScore) => {
+    const userId = localStorage.getItem('userId'); // Assuming you're storing the userId in localStorage
+
+    fetch('http://localhost:8000/saveScore', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: userId,
+        category: 'Your Category', // Replace this with the actual category, not quizUrl
+        score: finalScore,
+        totalQuestions: questions.length,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Score saved:', data);
+      })
+      .catch((error) => {
+        console.error('Error saving score:', error);
+      });
+
+    // Pass the final score to the parent component
+    onQuizComplete(finalScore);
+  };
+
   const handleNextQuestion = () => {
     const correctAnswer = questions[currentQuestionIndex].correct_answer;
-    if (selectedAnswer === correctAnswer) {
-      setScore(score + 1);
-    }
+    const newScore = selectedAnswer === correctAnswer ? score + 1 : score;
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
+      setTimeLeft(30); // Reset the timer for the next question
     } else {
       setIsQuizCompleted(true);
-      onQuizComplete(score + (selectedAnswer === correctAnswer ? 1 : 0));
+      handleQuizComplete(newScore); // Call handleQuizComplete to save the score and complete the quiz
     }
+
+    setScore(newScore); // Update the score in state
   };
 
   if (!quizUrl) {
@@ -76,6 +124,11 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
         <div className="text-xl font-semibold mb-6 text-center">
           Question {currentQuestionIndex + 1} / {questions.length}
         </div>
+
+        <div className="text-lg font-semibold text-center mb-4">
+          Time Left: {formatTime(timeLeft)}
+        </div>
+
         <h3 className="text-2xl font-bold mb-8" dangerouslySetInnerHTML={{ __html: currentQuestion.question }} />
 
         <Radio.Group

@@ -13,7 +13,6 @@ const Login = () => {
   const navigate = useNavigate();
   const onFinish = async (values) => {
   try {
-    // Send login data to the backend
     const response = await fetch('http://localhost:8000/login', {
       method: 'POST',
       headers: {
@@ -28,8 +27,7 @@ const Login = () => {
     const data = await response.json();
 
     if (response.ok) {
-      // If login is successful, redirect to categories
-      console.log('Login successful!', data);
+      localStorage.setItem('userId', data.userId);  // Store the user ID
       navigate('/categories');  // Redirect to categories
     } else {
       console.log('Login failed', data.message);
@@ -38,6 +36,7 @@ const Login = () => {
     console.error('Error during login:', error);
   }
 };
+
 
 
   const toggleDarkMode = (checked) => {
