@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
-import SignUp from './components/Signup';
+import SignUp from './components/SignUp';
 import CategorySelection from './components/CategorySelection';
 import Quiz from './components/quiz/Quiz';
 import Result from './components/quiz/Result';

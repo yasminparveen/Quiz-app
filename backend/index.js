@@ -1,24 +1,19 @@
-// Import required packages
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+import cors from "cors"; 
 
-// Create an Express app
 const app = express();
 
-// Load environment variables from .env file
 dotenv.config();
 
-// Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cors());
 
-// Set the port from environment variables or default to 7000
 const PORT = process.env.PORT || 7000;
-
-// Get the MongoDB connection URL from environment variables
 const MONGOURL = process.env.MONGO_URL;
 
-// Connect to MongoDB and start the server
 mongoose.connect(MONGOURL).then(() => {
   console.log("Database connected successfully.");
   app.listen(PORT, () => {
@@ -26,44 +21,91 @@ mongoose.connect(MONGOURL).then(() => {
   });
 });
 
-// Define the schema for the user data using Mongoose
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  age: { type: Number, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  age: { type: Number, required: false },
 });
 
-// Create a Mongoose model called "UserModel" based on the userSchema
 const UserModel = mongoose.model("User", userSchema);
 
-// Set up a route in the Express application to handle GET requests to "/getUsers"
 app.get("/getUsers", async (req, res) => {
   try {
-    // Await fetching all user data from the database using the UserModel
-    const userData = await UserModel.find();
-    // Send the user data as a JSON response
+    const userData = await UserModel.find({}, { password: 0 }); // Exclude password field
     res.json(userData);
   } catch (error) {
-    // Handle errors
     res.status(500).json({ message: "Error fetching users", error });
   }
 });
 
-// Set up a route in the Express application to handle POST requests to "/addUser"
-app.post("/addUser", async (req, res) => {
+app.post("/signup", async (req, res) => {
   try {
-    // Extract user data from the request body
-    const { name, age } = req.body;
+    const { username, email, password } = req.body;
 
-    // Create a new user document using the UserModel
-    const newUser = new UserModel({ name, age });
+    // Check if user already exists
+    const existingUser = await UserModel.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username or email already exists" });
+    }
 
-    // Save the new user document to the database
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create a new user
+    const newUser = new UserModel({
+      username: username,
+      email: email,
+      password: hashedPassword,
+    });
+
+    // Save the new user to the database
     await newUser.save();
 
     // Send a success response
+    res.status(201).json({ message: "User registered successfully", userId: newUser._id });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering user", error });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Find user by username or email
+    const user = await UserModel.findOne({ 
+      $or: [{ username: username }, { email: email }] 
+    });
+    
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Compare the provided password with the hashed password in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+    
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    // If login is successful, respond with success message
+    res.status(200).json({ message: "Login successful", userId: user._id });
+    
+  } catch (error) {
+    res.status(500).json({ message: "Error during login", error });
+  }
+});
+
+
+app.post("/addUser", async (req, res) => {
+  try {
+    const { name, age } = req.body;
+    const newUser = new UserModel({ name, age });
+    await newUser.save();
     res.status(201).json({ message: "User added successfully", user: newUser });
   } catch (error) {
-    // Handle errors
     res.status(500).json({ message: "Error adding user", error });
   }
 });

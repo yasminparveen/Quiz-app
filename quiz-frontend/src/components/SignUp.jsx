@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Switch } from 'antd';
-import { Link } from 'react-router-dom';  // Import Link
+import { Form, Input, Button, Typography, Switch, message } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserOutlined, LockOutlined, MailOutlined, UserAddOutlined } from '@ant-design/icons';
 import './SignUp.css';
 
@@ -8,10 +8,37 @@ const { Title } = Typography;
 
 const SignUp = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('Received values from the form: ', values);
-    // Handle form submission here
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/signup', { // Updated URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        message.success('Sign up successful!');
+        navigate('/'); // Redirect to login page
+      } else {
+        throw new Error(data.message || 'Sign up failed');
+      }
+    } catch (error) {
+      message.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleDarkMode = (checked) => {
@@ -79,7 +106,7 @@ const SignUp = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+          <Button type="primary" htmlType="submit" style={{ width: '100%' }} loading={loading}>
             Sign Up
           </Button>
         </Form.Item>

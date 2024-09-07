@@ -2,17 +2,43 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, Typography, Switch } from 'antd';
 import { Link } from 'react-router-dom';  // Import Link
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+
 import './Login.css';
 
 const { Title } = Typography;
 
 const Login = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const navigate = useNavigate();
+  const onFinish = async (values) => {
+  try {
+    // Send login data to the backend
+    const response = await fetch('http://localhost:8000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+      }),
+    });
 
-  const onFinish = (values) => {
-    console.log('Received values from the form: ', values);
-    // Handle form submission here
-  };
+    const data = await response.json();
+
+    if (response.ok) {
+      // If login is successful, redirect to categories
+      console.log('Login successful!', data);
+      navigate('/categories');  // Redirect to categories
+    } else {
+      console.log('Login failed', data.message);
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+  }
+};
+
 
   const toggleDarkMode = (checked) => {
     setDarkMode(checked);
