@@ -27,7 +27,7 @@ const SignUp = () => {
       });
 
       const data = await response.json();
-
+      console.log(response);
       if (response.ok) {
         message.success('Sign up successful!');
         navigate('/'); // Redirect to login page

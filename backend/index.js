@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 7000;
-const MONGOURL = process.env.MONGO_URL;
+const MONGOURL = process.env.MONGO_ATLAS_URL;
 
 mongoose.connect(MONGOURL).then(() => {
   console.log("Database connected successfully.");
