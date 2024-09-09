@@ -16,7 +16,7 @@ const Result = ({ score, totalQuestions, onRetry, onReturnToCategories }) => {
           <Button
             type="primary"
             size="large"
-            onClick={onRetry}
+            onClick={onReturnToCategories}
             icon={<ReloadOutlined />}
             className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500 w-full sm:w-auto"
           >

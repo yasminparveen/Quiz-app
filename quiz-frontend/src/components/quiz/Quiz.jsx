@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Radio, Card } from 'antd';
+import { Button, Radio, Card, Spin, message } from 'antd';
 
 const Quiz = ({ quizUrl, onQuizComplete }) => {
   const [questions, setQuestions] = useState([]);
@@ -7,15 +7,24 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds for each question
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [loading, setLoading] = useState(true); // Spinner state for quiz loading
 
-  // Fetch the questions from the API
+  // Fetch the quiz data
   useEffect(() => {
     if (quizUrl) {
+      setLoading(true);  // Show spinner while loading
       fetch(quizUrl)
         .then((response) => response.json())
-        .then((data) => setQuestions(data.results))
-        .catch((error) => console.error('Error fetching the quiz data:', error));
+        .then((data) => {
+          setQuestions(data.results);
+          setLoading(false);  // Hide spinner when data is loaded
+        })
+        .catch((error) => {
+          console.error('Error fetching the quiz data:', error);
+          message.error('Failed to load quiz data');  // Display error message
+          setLoading(false);
+        });
     }
   }, [quizUrl]);
 
@@ -43,16 +52,16 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   };
 
   const handleQuizComplete = (finalScore) => {
-    const userId = localStorage.getItem('userId'); // Assuming you're storing the userId in localStorage
+    const userId = localStorage.getItem('userId'); 
 
-    fetch('http://localhost:8000/saveScore', {
+    fetch(`${import.meta.env.VITE_API_URL}/saveScore`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         userId: userId,
-        category: 'Your Category', // Replace this with the actual category, not quizUrl
+        category: 'Your Category',
         score: finalScore,
         totalQuestions: questions.length,
       }),
@@ -60,9 +69,11 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
       .then((response) => response.json())
       .then((data) => {
         console.log('Score saved:', data);
+        message.success('Score saved successfully');  // Show success message
       })
       .catch((error) => {
         console.error('Error saving score:', error);
+        message.error('Failed to save score');  // Show error message
       });
 
     // Pass the final score to the parent component
@@ -89,8 +100,12 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
     return <div className="text-white text-center py-8">Please select a category to start the quiz.</div>;
   }
 
+  if (loading) {
+    return <div className="text-white text-center py-8"><Spin size="large" /> Loading questions...</div>;
+  }
+
   if (questions.length === 0) {
-    return <div className="text-white text-center py-8">Loading questions...</div>;
+    return <div className="text-white text-center py-8">No questions found.</div>;
   }
 
   if (isQuizCompleted) {

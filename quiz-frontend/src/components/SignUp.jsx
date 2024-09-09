@@ -14,7 +14,7 @@ const SignUp = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/signup', { // Updated URL
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ const SignUp = () => {
       });
 
       const data = await response.json();
-      console.log(response);
+
       if (response.ok) {
         message.success('Sign up successful!');
         navigate('/'); // Redirect to login page
@@ -35,9 +35,9 @@ const SignUp = () => {
         throw new Error(data.message || 'Sign up failed');
       }
     } catch (error) {
-      message.error(error.message);
+      message.error(error.message || 'Sign up failed');
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop the spinner
     }
   };
 
