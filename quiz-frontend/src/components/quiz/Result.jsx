@@ -4,11 +4,11 @@ import { TrophyOutlined, ReloadOutlined } from '@ant-design/icons';
 
 const Result = ({ score, totalQuestions, onRetry, onReturnToCategories }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
-      <div className="bg-gray-800 p-10 rounded-lg shadow-lg text-center">
-        <TrophyOutlined className="text-yellow-400 text-6xl mb-4" />
-        <h2 className="text-white text-4xl font-bold mb-4">Quiz Completed!</h2>
-        <p className="text-white text-2xl mb-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-emerald-300">
+      <div className="bg-emerald-100 p-10 rounded-lg shadow-lg text-center">
+        <TrophyOutlined className="text-yellow-500 text-6xl mb-4" />
+        <h2 className="text-emerald-900 text-4xl font-bold mb-4">Quiz Completed!</h2>
+        <p className="text-emerald-800 text-2xl mb-8">
           You scored {score} out of {totalQuestions}
         </p>
 
@@ -16,16 +16,16 @@ const Result = ({ score, totalQuestions, onRetry, onReturnToCategories }) => {
           <Button
             type="primary"
             size="large"
-            onClick={onReturnToCategories}
+            onClick={onRetry}
             icon={<ReloadOutlined />}
-            className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500 w-full sm:w-auto"
+            className="bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 w-full sm:w-auto"
           >
             Try Again
           </Button>
           <Button
             size="large"
             onClick={onReturnToCategories}
-            className="bg-green-600 text-white border-green-600 hover:bg-green-500 w-full sm:w-auto"
+            className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500 w-full sm:w-auto"
           >
             Select Another Category
           </Button>

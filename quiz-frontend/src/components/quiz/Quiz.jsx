@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Radio, Card, Spin, message } from 'antd';
+import { Button, Radio, Card, Spin, message, Avatar, Typography } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+
+const { Text } = Typography;
 
 const Quiz = ({ quizUrl, onQuizComplete }) => {
   const [questions, setQuestions] = useState([]);
@@ -9,6 +12,10 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
   const [loading, setLoading] = useState(true); // Spinner state for quiz loading
+
+  // Retrieve user profile details from localStorage
+  const username = localStorage.getItem('username');
+  const email = localStorage.getItem('email');
 
   // Fetch the quiz data
   useEffect(() => {
@@ -97,20 +104,20 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   };
 
   if (!quizUrl) {
-    return <div className="text-white text-center py-8">Please select a category to start the quiz.</div>;
+    return <div className="text-dark text-center py-8">Please select a category to start the quiz.</div>;
   }
 
   if (loading) {
-    return <div className="text-white text-center py-8"><Spin size="large" /> Loading questions...</div>;
+    return <div className="text-dark text-center py-8"><Spin size="large" /> Loading questions...</div>;
   }
 
   if (questions.length === 0) {
-    return <div className="text-white text-center py-8">No questions found.</div>;
+    return <div className="text-dark text-center py-8">No questions found.</div>;
   }
 
   if (isQuizCompleted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-emerald-300 relative">
         <h2 className="text-white text-3xl font-bold mb-4">Quiz Completed!</h2>
         <p className="text-white text-xl mb-6">
           Your Score: {score}/{questions.length}
@@ -118,7 +125,7 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
         <Button
           type="primary"
           size="large"
-          className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500"
+          className="bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500"
           onClick={() => onQuizComplete(null)}
         >
           Play Again
@@ -134,8 +141,16 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
   ].sort(); // Shuffle the answers
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
-      <Card className="w-full max-w-2xl bg-gray-800 border-none text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-emerald-300 relative">
+      {/* User Profile Display */}
+      <div className="absolute top-5 right-5 flex items-center">
+        <Avatar icon={<UserOutlined />} size="large" />
+        <div style={{ marginLeft: '10px', color: '#fff' }}>
+          <Text strong>{username}</Text>
+        </div>
+      </div>
+
+      <Card className="w-full max-w-2xl bg-emerald-100 border-none text-emerald-900">
         <div className="text-xl font-semibold mb-6 text-center">
           Question {currentQuestionIndex + 1} / {questions.length}
         </div>
@@ -144,7 +159,7 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
           Time Left: {formatTime(timeLeft)}
         </div>
 
-        <h3 className="text-2xl font-bold mb-8" dangerouslySetInnerHTML={{ __html: currentQuestion.question }} />
+        <h3 className="text-2xl font-bold mb-8 text-emerald-800" dangerouslySetInnerHTML={{ __html: currentQuestion.question }} />
 
         <Radio.Group
           onChange={handleAnswerChange}
@@ -155,8 +170,8 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
             <Radio
               key={index}
               value={answer}
-              className={`bg-gray-700 p-4 rounded-lg cursor-pointer text-lg text-white hover:bg-gray-600 ${
-                selectedAnswer === answer ? 'bg-blue-500' : ''
+              className={`bg-white p-4 rounded-lg cursor-pointer text-lg text-emerald-900 hover:bg-emerald-200 ${
+                selectedAnswer === answer ? 'bg-emerald-500 text-white' : ''
               }`}
             >
               <span dangerouslySetInnerHTML={{ __html: answer }} />
@@ -170,7 +185,7 @@ const Quiz = ({ quizUrl, onQuizComplete }) => {
             size="large"
             onClick={handleNextQuestion}
             disabled={!selectedAnswer}
-            className="bg-blue-600 text-white border-blue-600 hover:bg-blue-500"
+            className="bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500"
           >
             {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
           </Button>
